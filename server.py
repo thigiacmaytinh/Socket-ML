@@ -1,6 +1,4 @@
-from datetime import datetime
 import socket
-from unittest import result
 import cv2
 import os
 import json

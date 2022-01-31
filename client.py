@@ -1,6 +1,4 @@
-from datetime import datetime
 import socket
-from time import sleep
 from PIL import Image
 import json
 import base64
