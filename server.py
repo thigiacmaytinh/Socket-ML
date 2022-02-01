@@ -4,6 +4,7 @@ import os
 import json
 import numpy as np
 import base64
+import random, string
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -90,6 +91,23 @@ def MatToBase64(mat):
 
 ####################################################################################################
 
+def WriteBase64ToDisk(base64Str, filePathAbs):
+    with open(filePathAbs, 'wb') as f:
+        f.write(base64.b64decode(base64Str))
+
+####################################################################################################
+
+def GenerateRandomString(length=10):
+    return ''.join(random.choices(string.ascii_lowercase + "_" + string.ascii_uppercase +  string.digits, k=length))
+
+####################################################################################################
+
+def MkDir(dirPath):
+    if not os.path.exists(dirPath):
+        os.mkdir(dirPath)
+
+####################################################################################################
+
 faceboxDetector = FaceBoxDetector("cpu")
 print("Socket server load model complete")
 
@@ -98,6 +116,9 @@ PORT = 8000
 SERVER = (HOST, PORT)
 MAX_CONNECTION = 255
 BUFFER_SIZE = 1048576 #1MB
+
+
+MkDir(os.path.join(CURRENT_DIR, "temp"))
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind(SERVER)
@@ -116,6 +137,9 @@ while True:
             break
 
         data = json.loads(str_data)
+        filePathAbs = os.path.join(CURRENT_DIR, "temp", GenerateRandomString() + '.jpg')
+        WriteBase64ToDisk(data["imageBase64"], filePathAbs)
+
         frame = Base64ToMat(data["imageBase64"])
         frameDraw, bboxes = faceboxDetector.getFaceBoxInMat(frame, drawResult=True)
 
